@@ -7,6 +7,8 @@ from jinja2.ext import _make_new_gettext, _make_new_ngettext
 
 __version__ = '0.1.0'
 
+def get_request_container(request):
+    return request.ctx.__dict__ if hasattr(request, "ctx") else request
 
 class GatcoJinja2:
     def __init__(self, app=None, loader=None, pkg_name=None, pkg_path=None,
@@ -50,8 +52,9 @@ class GatcoJinja2:
             context.setdefault('ngettext', ng)
             context.setdefault('_', context['gettext'])
 
-        if 'session' in request:
-            context.setdefault('session', request['session'])
+        req = get_request_container(request)
+        if 'session' in req:
+            context.setdefault('session', req['session'])
 
         context.setdefault('_', self.fake_trans)
         context.setdefault('request', request)
