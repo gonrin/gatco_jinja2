@@ -3,6 +3,7 @@
 
 from gatco.response import html
 from jinja2 import Environment, PackageLoader
+from jinja2.sandbox import SandboxedEnvironment
 from jinja2.ext import _make_new_gettext, _make_new_ngettext
 
 __version__ = '0.1.0'
@@ -11,9 +12,12 @@ def get_request_container(request):
     return request.ctx.__dict__ if hasattr(request, "ctx") else request
 
 class GatcoJinja2:
-    def __init__(self, app=None, loader=None, pkg_name=None, pkg_path=None,
+    def __init__(self, app=None, loader=None, pkg_name=None, pkg_path=None, sandbox=False,
                  **kwargs):
-        self.env = Environment(**kwargs)
+        if sandbox is True:
+            self.env = SandboxedEnvironment(**kwargs)
+        else:
+            self.env = Environment(**kwargs)
         self.app = app
         if app:
             self.init_app(app, loader, pkg_name or app.name, pkg_path)
